@@ -1,0 +1,55 @@
+<resources>
+
+    <!-- App name -->
+    <string name="app_name">PoseTrack</string>
+
+    <!-- Titles -->
+    <string name="title_app">🎯 PoseTrack Dead Reckoning</string>
+    <string name="subtitle">Dead Reckoning Navigation</string>
+
+    <!-- TAbs -->
+    <string name="pose_track_navigation">PoseTrack Navigation</string>
+    <string name="navigation_tabs">Navigation tabs</string>
+
+    <!-- Position labels -->
+    <string name="position_label">📍 POSITION</string>
+    <string name="starting_sensors">Starting sensors…</string>
+    <string name="waiting_to_start">Position: Waiting…</string>
+    <string name="position_reset">Position reset to origin</string>
+
+    <!-- Position format -->
+    <!-- X, Y, Heading (in degrees) -->
+    <string name="position_format">
+        X: %1$.3f m | Y: %2$.3f m | Heading: %3$.0f°
+    </string>
+
+    <!-- Statistics -->
+    <string name="stats_label">📊 STATISTICS</string>
+    <string name="stats_initializing">Initializing…</string>
+    <string name="stats_not_available">Stats: Not available</string>
+    <string name="statistics_cleared">Statistics cleared</string>
+
+    <!-- Correct stats format (YOUR MODEL has: stepCount, distance, pathPoints) -->
+    <string name="stats_format">
+        Steps: %1$d | Distance: %2$.2f m | Points: %3$d
+    </string>
+
+    <!-- Buttons -->
+    <string name="start_btn">START</string>
+    <string name="stop_btn">STOP</string>
+    <string name="reset_btn">RESET</string>
+
+    <!-- Toast messages -->
+    <string name="path_info">Points: %1$d | Scale: %2$.2f</string>
+    <string name="toast_permissions_granted">✓ Permissions granted</string>
+    <string name="toast_permissions_denied">⚠ Some permissions denied</string>
+    <string name="toast_tracking_started">✓ Tracking STARTED - Move around!</string>
+    <string name="toast_service_disconnected">Service disconnected</string>
+    <string name="toast_tracking_stopped">Tracking stopped</string>
+    <string name="toast_position_reset">↻ Position reset</string>
+
+
+    <string name="position_reset_label">Position: Reset</string>
+    <string name="stats_cleared_label">Stats: Cleared</string>
+
+</resources>

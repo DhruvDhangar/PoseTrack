@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- Path visualization area -->
+    <com.example.posetrack.PathView
+        android:id="@+id/pathView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="#FFFFFF"
+        android:elevation="2dp"/>
+
+    <!-- Info container with ScrollView for small screens -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="140dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/positionText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/waiting_to_start"
+                android:textSize="12sp"
+                android:textColor="#212121"
+                android:fontFamily="monospace"
+                android:padding="8dp"
+                android:background="#FAFAFA"
+                android:layout_marginBottom="6dp"
+                android:minHeight="40dp"
+                android:gravity="center_vertical"
+                android:maxLines="3"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/statsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/stats_not_available"
+                android:textSize="12sp"
+                android:textColor="#212121"
+                android:fontFamily="monospace"
+                android:padding="8dp"
+                android:background="#FAFAFA"
+                android:minHeight="40dp"
+                android:gravity="center_vertical"
+                android:maxLines="3"
+                android:ellipsize="end"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Button container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="#FFFFFF"
+        android:baselineAligned="false">
+
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="@string/start_btn"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#4CAF50"
+            android:layout_marginEnd="4dp"
+            android:minWidth="0dp"
+            android:minHeight="48dp"
+            android:maxWidth="120dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            tools:ignore="ButtonStyle,TextContrastCheck"/>
+
+        <Button
+            android:id="@+id/stopButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="@string/stop_btn"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#F44336"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:minWidth="0dp"
+            android:minHeight="48dp"
+            android:maxWidth="120dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            tools:ignore="ButtonStyle,TextContrastCheck"/>
+
+        <Button
+            android:id="@+id/resetButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="@string/reset_btn"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#616161"
+            android:layout_marginStart="4dp"
+            android:minWidth="0dp"
+            android:minHeight="48dp"
+            android:maxWidth="120dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            tools:ignore="ButtonStyle,TextContrastCheck"/>
+
+    </LinearLayout>
+
+</LinearLayout>
