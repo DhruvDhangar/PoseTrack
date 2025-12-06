@@ -33,7 +33,7 @@ class DeadReckoningFragment : Fragment() {
             drService = binder.getService()
             bound = true
             setupListener()
-            Toast.makeText(requireContext(), getString(R.string.toast_tracking_started), Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Tracking started - Keep device stationary for 2 sec to calibrate", Toast.LENGTH_LONG).show()
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
@@ -87,7 +87,6 @@ class DeadReckoningFragment : Fragment() {
     private fun reset() {
         drService?.getDRModule()?.resetPosition(0.0, 0.0, 0.0)
         pathView.reset()
-        // use existing string resources
         positionText.text = getString(R.string.position_reset_label)
         statsText.text = getString(R.string.stats_cleared_label)
     }
@@ -95,24 +94,34 @@ class DeadReckoningFragment : Fragment() {
     private fun setupListener() {
         drService?.getDRModule()?.addPositionListener { pos ->
             activity?.runOnUiThread {
-                // Use position_format from strings.xml: X: %1$.3f m | Y: %2$.3f m | Heading: %3$.0f°
                 val headingDeg = Math.toDegrees(pos.heading).toFloat()
+
+                // Show position with quality indicator
+                val qualityIcon = when {
+                    pos.quality > 0.7f -> "🟢"
+                    pos.quality > 0.4f -> "🟡"
+                    else -> "🔴"
+                }
+
                 positionText.text = getString(
                     R.string.position_format,
                     pos.x,
                     pos.y,
                     headingDeg
-                )
+                ) + " $qualityIcon"
 
                 val stats = drService?.getDRModule()?.getStats()
                 stats?.let {
-                    // stats_format: Steps: %1$d | Distance: %2$.2f m | Points: %3$d
+                    // Add calibration and stationary status
+                    val calibIcon = if (it.isCalibrated) "✓" else "⏳"
+                    val stationaryIcon = if (it.isStationary) "🛑" else "🚶"
+
                     statsText.text = getString(
                         R.string.stats_format,
                         it.stepCount,
                         it.distance,
                         it.pathPoints
-                    )
+                    ) + " | Cal:$calibIcon Stat:$stationaryIcon"
                 }
 
                 pathView.updatePath(drService?.getDRModule()?.getPathHistory() ?: emptyList())
@@ -125,7 +134,7 @@ class DeadReckoningFragment : Fragment() {
         if (bound) {
             try {
                 requireContext().unbindService(connection)
-            } catch (_: Exception) { /* ignore */ }
+            } catch (_: Exception) { }
         }
     }
 }

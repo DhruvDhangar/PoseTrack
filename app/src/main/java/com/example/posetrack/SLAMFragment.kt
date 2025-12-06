@@ -37,10 +37,11 @@ class SLAMFragment : Fragment() {
     private var cameraProvider: ProcessCameraProvider? = null
     private var imageAnalysis: ImageAnalysis? = null
 
+    // Use improved SLAM module
     private val slamModule = SLAMModule()
     private var bitmapBuffer: Bitmap? = null
 
-    // reusable temp arrays to reduce allocations
+    // Reusable temp arrays
     private var pixelRow: IntArray? = null
     private var rgbaRowBuffer: ByteArray? = null
 
@@ -65,11 +66,10 @@ class SLAMFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupButtons()
-        // Start camera only if we have camera permission
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             startCamera()
         } else {
-            // rely on MainActivity permission flow; disable start until permission granted
             startButton.isEnabled = false
             stopButton.isEnabled = false
         }
@@ -108,10 +108,8 @@ class SLAMFragment : Fragment() {
                 .build()
                 .also { it.setSurfaceProvider(previewView.surfaceProvider) }
 
-            // Request RGBA_8888 output so we don't need YUV->RGB conversion.
             imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                // intentionally not calling setTargetResolution to avoid CameraX version mismatch
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 .build()
 
@@ -129,19 +127,14 @@ class SLAMFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    /**
-     * Convert an RGBA_8888 ImageProxy to an ARGB_8888 Bitmap (reusing buffers).
-     * Assumes ImageProxy.format == RGBA_8888 and single plane with pixelStride >= 4.
-     */
     private fun imageProxyToBitmapRGBA(image: ImageProxy, outBitmap: Bitmap): Bitmap {
         val width = image.width
         val height = image.height
         val plane = image.planes[0]
         val buffer: ByteBuffer = plane.buffer
         val rowStride = plane.rowStride
-        val pixelStride = plane.pixelStride // typically 4 for RGBA
+        val pixelStride = plane.pixelStride
 
-        // ensure row buffers
         if (rgbaRowBuffer == null || rgbaRowBuffer!!.size < rowStride) {
             rgbaRowBuffer = ByteArray(rowStride)
         }
@@ -152,7 +145,6 @@ class SLAMFragment : Fragment() {
         val rowBytes = rgbaRowBuffer!!
         val pixels = pixelRow!!
 
-        // iterate rows
         for (y in 0 until height) {
             val offset = y * rowStride
             buffer.position(offset)
@@ -194,31 +186,42 @@ class SLAMFragment : Fragment() {
             }
             val bmp = bitmapBuffer!!
 
-            // ensure buffer position is at start
             imageProxy.planes[0].buffer.rewind()
-            // convert RGBA plane -> ARGB bitmap (on cameraExecutor thread)
             imageProxyToBitmapRGBA(imageProxy, bmp)
 
-            // run SLAM processing on cameraExecutor (we're already on it)
+            // Process on camera executor thread
             cameraExecutor.execute {
                 try {
+                    val frameStart = System.currentTimeMillis()
                     slamModule.processFrame(bmp)
+                    val processingTime = System.currentTimeMillis() - frameStart
 
-                    // update UI on main thread
                     val stats = slamModule.getStats()
                     requireActivity().runOnUiThread {
+                        // Show position with uncertainty indicator
+                        val uncertaintyIcon = when {
+                            stats.uncertainty < 0.5 -> "🟢"
+                            stats.uncertainty < 1.0 -> "🟡"
+                            else -> "🔴"
+                        }
+
                         positionText.text = String.format(
                             getString(R.string.position_format),
                             slamModule.getCurrentPosition().x,
                             slamModule.getCurrentPosition().y,
-                            0.0 // heading not computed by this SLAM prototype
-                        )
+                            Math.toDegrees(slamModule.getCurrentPosition().heading)
+                        ) + " $uncertaintyIcon"
+
+                        // Show detailed stats
                         statsText.text = String.format(
-                            getString(R.string.stats_format),
+                            "Frames: %d | Dist: %.2f m | Landmarks: %d\nQuality: %s | Processing: %dms",
                             stats.frameCount,
                             stats.distance,
-                            stats.pathPoints
+                            stats.mapFeatures,
+                            stats.trackingQuality,
+                            processingTime
                         )
+
                         slamView.updatePath(slamModule.getPathHistory(), slamModule.getMapFeatures())
                     }
                 } catch (e: Exception) {

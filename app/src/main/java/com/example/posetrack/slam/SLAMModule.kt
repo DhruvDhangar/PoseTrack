@@ -144,7 +144,7 @@ class SLAMModule(
 
             // Step 4: Convert features to observations
             val observations = currFeatures.take(20).map { feat ->
-                featureToObservation(feat, frame.width, frame.height)
+                featureToObservation(feat, frame.height)
             }
 
             // Step 5: EKF Update (Measurement Model)
@@ -313,15 +313,17 @@ class SLAMModule(
 
     /**
      * Convert image feature to observation (range, bearing)
+     * Uses only vertical position for depth estimation
      */
-    private fun featureToObservation(feat: FeaturePoint, w: Int, h: Int): Observation {
-        val normX = (feat.x - w / 2.0) / (w / 2.0)
-        val normY = (feat.y - h / 2.0) / (h / 2.0)
+    private fun featureToObservation(feat: FeaturePoint, imageHeight: Int): Observation {
+        // Horizontal bearing from center
+        val bearing = atan2(feat.x - imageHeight / 2.0, imageHeight.toDouble()) * 0.5
 
-        val bearing = atan2(normX, 1.0)
-        val range = sqrt(normX * normX + normY * normY + 1.0) * 0.3
+        // Depth estimation based on vertical position (objects lower in image are closer)
+        val normalizedY = feat.y / imageHeight
+        val estimatedDepth = (0.5 + normalizedY * 1.5).coerceIn(0.3, 3.0)
 
-        return Observation(range, bearing)
+        return Observation(estimatedDepth, bearing)
     }
 
     data class Observation(val range: Double, val bearing: Double)
@@ -355,7 +357,7 @@ class SLAMModule(
     fun getPathHistory(): List<Position> = pathHistory.toList()
 
     fun getMapFeatures(): List<FeaturePoint> {
-        // Convert landmarks to visual features
+        // Convert landmarks to visual features for display
         return landmarks.map { lm ->
             val x = (lm.r * cos(lm.alpha) * 100).toFloat()
             val y = (lm.r * sin(lm.alpha) * 100).toFloat()
@@ -365,7 +367,7 @@ class SLAMModule(
 
     fun getStats(): SLAMStats {
         val dist = sqrt(robotX * robotX + robotY * robotY)
-        val avgObs = if (landmarks.isNotEmpty()) {
+        if (landmarks.isNotEmpty()) {
             landmarks.map { it.observations }.average().toInt()
         } else 0
 
@@ -385,7 +387,8 @@ class SLAMModule(
             trackingQuality = trackingQuality,
             isCalibrated = landmarks.size > 5,
             avgMatches = if (totalProcessed > 0) totalMatches / totalProcessed else 0,
-            avgProcessingTimeMs = 0L
+            avgProcessingTimeMs = 0L,
+            uncertainty = 0.1F
         )
     }
 
@@ -398,7 +401,8 @@ class SLAMModule(
         val trackingQuality: String,
         val isCalibrated: Boolean,
         val avgMatches: Int,
-        val avgProcessingTimeMs: Long
+        val avgProcessingTimeMs: Long,
+        val uncertainty: Float
     )
 }
 

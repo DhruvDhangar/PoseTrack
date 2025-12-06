@@ -4,10 +4,11 @@
 
     <!-- Hardware features -->
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="true" />
     <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
     <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
 
-    <!-- Camera features added -->
+    <!-- Camera features -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
@@ -28,15 +29,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PoseTrack">
 
+        <!--
+            SPLASH ACTIVITY - This is the FIRST screen that opens
+            exported="true" means it can be launched from outside the app
+            This has the LAUNCHER intent filter
+        -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!--
+            MAIN ACTIVITY - This opens AFTER the splash screen
+            exported="false" means it can only be opened from within the app
+            NO intent filter here (moved to SplashActivity)
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
+
+        <!-- Dead Reckoning Service -->
         <service
             android:name=".dr.DeadReckoningService"
             android:enabled="true"

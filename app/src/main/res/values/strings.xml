@@ -2,6 +2,8 @@
 
     <!-- App name -->
     <string name="app_name">PoseTrack</string>
+    <string name="app_tagline"> Finds Your Path ! </string>
+    <string name="splash_footer"> Group - 12 </string>
 
     <!-- Titles -->
     <string name="title_app">🎯 PoseTrack Dead Reckoning</string>
@@ -12,7 +14,7 @@
     <string name="navigation_tabs">Navigation tabs</string>
 
     <!-- Position labels -->
-    <string name="position_label">📍 POSITION</string>
+    <string name="position_label">POSITION</string>
     <string name="starting_sensors">Starting sensors…</string>
     <string name="waiting_to_start">Position: Waiting…</string>
     <string name="position_reset">Position reset to origin</string>
